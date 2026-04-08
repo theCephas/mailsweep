@@ -1,0 +1,49 @@
+{
+  "name": "@mailsweep/api",
+  "version": "1.0.0",
+  "description": "MailSweep NestJS Backend API",
+  "license": "MIT",
+  "scripts": {
+    "build": "nest build",
+    "dev": "nest start --watch",
+    "start": "nest start",
+    "start:prod": "node dist/apps/api/src/main",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@mailsweep/types": "*",
+    "@nestjs/common": "^10.3.0",
+    "@nestjs/core": "^10.3.0",
+    "@nestjs/platform-express": "^10.3.0",
+    "@nestjs/config": "^3.1.1",
+    "@nestjs/passport": "^10.0.3",
+    "@nestjs/jwt": "^10.2.0",
+    "@prisma/client": "^5.8.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-jwt": "^4.0.1",
+    "googleapis": "^130.0.0",
+    "google-auth-library": "^9.4.1",
+    "cookie-parser": "^1.4.6",
+    "class-validator": "^0.14.0",
+    "class-transformer": "^0.5.1",
+    "reflect-metadata": "^0.2.1",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.2.1",
+    "@nestjs/schematics": "^10.0.3",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.6",
+    "@types/passport-google-oauth20": "^2.0.14",
+    "@types/passport-jwt": "^4.0.0",
+    "@types/cookie-parser": "^1.4.6",
+    "prisma": "^5.8.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

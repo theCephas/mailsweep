@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-sans: 'Manrope', sans-serif;
+
+    --background: 32 45% 96%;
+    --surface: 0 0% 100%;
+    --border: 222 16% 87%;
+    --primary: 216 89% 52%;
+    --accent: 28 92% 55%;
+    --text: 222 30% 12%;
+    --muted: 219 12% 45%;
+    --danger: 0 78% 55%;
+    --success: 152 55% 38%;
+    --shadow: 220 40% 20%;
+    --grid: 220 22% 85%;
+  }
+
+  .dark {
+    --background: 224 30% 8%;
+    --surface: 223 24% 12%;
+    --border: 223 18% 20%;
+    --primary: 152 62% 52%;
+    --accent: 35 92% 60%;
+    --text: 210 35% 96%;
+    --muted: 217 14% 70%;
+    --danger: 0 75% 60%;
+    --success: 152 55% 50%;
+    --shadow: 220 45% 6%;
+    --grid: 223 16% 18%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-text antialiased font-sans;
+  }
+
+  ::selection {
+    @apply bg-primary/20 text-text;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-background font-medium px-6 py-3 rounded-lg transition-all duration-200 hover:shadow-primary-glow hover:scale-[1.02] active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-surface text-text border border-border font-medium px-6 py-3 rounded-lg transition-all duration-200 hover:border-primary/60 hover:text-primary;
+  }
+
+  .input {
+    @apply bg-surface border border-border text-text px-4 py-2 rounded-lg focus:outline-none focus:border-primary transition-colors;
+  }
+
+  .card {
+    @apply bg-surface border border-border rounded-2xl p-6 shadow-soft;
+  }
+
+  .hero-grid {
+    background-image:
+      radial-gradient(circle at top right, hsl(var(--primary) / 0.18), transparent 45%),
+      radial-gradient(circle at 20% 10%, hsl(var(--accent) / 0.2), transparent 40%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 60%, hsl(var(--surface)) 100%);
+  }
+
+  .grid-overlay {
+    background-image:
+      linear-gradient(transparent 0, transparent 47px, hsl(var(--grid) / 0.4) 48px),
+      linear-gradient(90deg, transparent 0, transparent 47px, hsl(var(--grid) / 0.4) 48px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(circle at center, black 0%, transparent 70%);
+    -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 70%);
+  }
+
+  /* Noise texture overlay */
+  .noise-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.04;
+  }
+
+  .glass {
+    @apply bg-surface/70 border border-border/80 backdrop-blur-xl;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-4 py-1 text-xs uppercase tracking-[0.2em] text-muted;
+  }
+
+  /* Toast animation */
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+}

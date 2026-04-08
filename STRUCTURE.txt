@@ -1,0 +1,97 @@
+MailSweep Project Structure
+═══════════════════════════════════════════════════════════
+
+mailsweep/
+│
+├── 📄 package.json                    # Root workspace config
+├── 📄 .gitignore                      # Git ignore rules
+├── 📄 .env.example                    # Root env template
+├── 📄 README.md                       # Full documentation
+├── 📄 QUICKSTART.md                   # Quick start guide
+├── 📄 PROJECT_SUMMARY.md              # Architecture overview
+│
+├── 📁 apps/
+│   │
+│   ├── 📁 api/                        # NestJS Backend
+│   │   ├── 📄 package.json
+│   │   ├── 📄 tsconfig.json
+│   │   ├── 📄 nest-cli.json
+│   │   ├── 📄 .env.example
+│   │   │
+│   │   ├── 📁 prisma/
+│   │   │   └── 📄 schema.prisma       # Database schema
+│   │   │
+│   │   └── 📁 src/
+│   │       ├── 📄 main.ts             # Entry point
+│   │       ├── 📄 app.module.ts       # Root module
+│   │       │
+│   │       ├── 📁 prisma/             # Database module
+│   │       │   ├── 📄 prisma.module.ts
+│   │       │   └── 📄 prisma.service.ts
+│   │       │
+│   │       ├── 📁 auth/               # Authentication
+│   │       │   ├── 📄 auth.module.ts
+│   │       │   ├── 📄 auth.controller.ts
+│   │       │   ├── 📄 auth.service.ts
+│   │       │   ├── 📁 strategies/
+│   │       │   │   ├── 📄 google.strategy.ts
+│   │       │   │   └── 📄 jwt.strategy.ts
+│   │       │   └── 📁 guards/
+│   │       │       ├── 📄 google-auth.guard.ts
+│   │       │       └── 📄 jwt-auth.guard.ts
+│   │       │
+│   │       ├── 📁 users/              # User management
+│   │       │   ├── 📄 users.module.ts
+│   │       │   └── 📄 users.service.ts
+│   │       │
+│   │       └── 📁 gmail/              # Gmail integration
+│   │           ├── 📄 gmail.module.ts
+│   │           ├── 📄 gmail.controller.ts
+│   │           ├── 📄 gmail.service.ts
+│   │           └── 📁 dto/
+│   │               ├── 📄 search-emails.dto.ts
+│   │               └── 📄 bulk-action.dto.ts
+│   │
+│   └── 📁 web/                        # Next.js Frontend
+│       ├── 📄 package.json
+│       ├── 📄 tsconfig.json
+│       ├── 📄 next.config.js
+│       ├── 📄 tailwind.config.ts
+│       ├── 📄 postcss.config.js
+│       ├── 📄 .env.example
+│       │
+│       ├── 📁 app/                    # Next.js App Router
+│       │   ├── 📄 layout.tsx          # Root layout
+│       │   ├── 📄 page.tsx            # Landing page
+│       │   ├── 📄 providers.tsx       # React providers
+│       │   ├── 📄 globals.css         # Global styles
+│       │   │
+│       │   ├── 📁 auth/
+│       │   │   └── 📁 callback/
+│       │   │       └── 📄 page.tsx    # OAuth callback
+│       │   │
+│       │   └── 📁 dashboard/
+│       │       └── 📄 page.tsx        # Main dashboard
+│       │
+│       ├── 📁 components/
+│       │   └── 📁 ui/                 # UI components
+│       │       ├── 📄 button.tsx
+│       │       ├── 📄 input.tsx
+│       │       ├── 📄 dialog.tsx
+│       │       ├── 📄 toast.tsx
+│       │       └── 📄 skeleton.tsx
+│       │
+│       └── 📁 lib/                    # Utilities
+│           ├── 📄 api.ts              # API client
+│           ├── 📄 auth-context.tsx    # Auth context
+│           └── 📄 utils.ts            # Helpers
+│
+└── 📁 packages/
+    └── 📁 types/                      # Shared types
+        ├── 📄 package.json
+        ├── 📄 tsconfig.json
+        └── 📄 index.ts                # Type definitions
+
+═══════════════════════════════════════════════════════════
+Total: 43+ files across 3 workspaces
+Backend: 16 files | Frontend: 14 files | Shared: 3 files

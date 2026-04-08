@@ -1,132 +1,147 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/auth-context'
-import { useMutation } from '@tanstack/react-query'
-import { gmailApi } from '@/lib/api'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import { ToastContainer, useToast } from '@/components/ui/toast'
-import { Dialog, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Mail, LogOut, Search, Trash2, AlertTriangle, Home } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme-toggle'
-import type { EmailItem } from '@mailsweep/types'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import { useMutation } from "@tanstack/react-query";
+import { gmailApi } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ToastContainer, useToast } from "@/components/ui/toast";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Mail,
+  LogOut,
+  Search,
+  Trash2,
+  AlertTriangle,
+  Home,
+} from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import type { EmailItem } from "@mailsweep/types";
 
 export default function Dashboard() {
-  const router = useRouter()
-  const { user, isLoading: authLoading, isAuthenticated, logout } = useAuth()
-  const { toasts, showToast, removeToast } = useToast()
+  const router = useRouter();
+  const { user, isLoading: authLoading, isAuthenticated, logout } = useAuth();
+  const { toasts, showToast, removeToast } = useToast();
 
-  const [sender, setSender] = useState('')
-  const [fromDate, setFromDate] = useState('')
-  const [toDate, setToDate] = useState('')
-  const [emails, setEmails] = useState<EmailItem[]>([])
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [currentPage, setCurrentPage] = useState(0)
-  const EMAILS_PER_PAGE = 15
+  const [sender, setSender] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [emails, setEmails] = useState<EmailItem[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const EMAILS_PER_PAGE = 15;
 
   useEffect(() => {
     // Only redirect to home if not loading and explicitly not authenticated
     // This prevents redirecting authenticated users who want to access the home page
     if (!authLoading && !isAuthenticated) {
-      router.push('/')
+      router.push("/");
     }
-  }, [authLoading, isAuthenticated, router])
+  }, [authLoading, isAuthenticated, router]);
 
   const searchMutation = useMutation({
-    mutationFn: () => gmailApi.searchEmails({ sender, from: fromDate, to: toDate }),
+    mutationFn: () =>
+      gmailApi.searchEmails({ sender, from: fromDate, to: toDate }),
     onSuccess: (data) => {
-      setEmails(data.emails)
-      setSelectedIds(new Set())
-      setCurrentPage(0)
-      showToast(`Found ${data.total} email(s)`, 'success')
+      setEmails(data.emails);
+      setSelectedIds(new Set());
+      setCurrentPage(0);
+      showToast(`Found ${data.total} email(s)`, "success");
     },
     onError: () => {
-      showToast('Failed to search emails', 'error')
+      showToast("Failed to search emails", "error");
     },
-  })
+  });
 
   const trashMutation = useMutation({
     mutationFn: (ids: string[]) => gmailApi.trashEmails(ids),
     onSuccess: (data) => {
-      setEmails((prev) => prev.filter((email) => !selectedIds.has(email.id)))
-      setSelectedIds(new Set())
-      showToast(data.message, 'success')
+      setEmails((prev) => prev.filter((email) => !selectedIds.has(email.id)));
+      setSelectedIds(new Set());
+      showToast(data.message, "success");
     },
     onError: () => {
-      showToast('Failed to trash emails', 'error')
+      showToast("Failed to trash emails", "error");
     },
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (ids: string[]) => gmailApi.deleteEmails(ids),
     onSuccess: (data) => {
-      setEmails((prev) => prev.filter((email) => !selectedIds.has(email.id)))
-      setSelectedIds(new Set())
-      setShowDeleteDialog(false)
-      showToast(data.message, 'success')
+      setEmails((prev) => prev.filter((email) => !selectedIds.has(email.id)));
+      setSelectedIds(new Set());
+      setShowDeleteDialog(false);
+      showToast(data.message, "success");
     },
     onError: () => {
-      showToast('Failed to delete emails', 'error')
-      setShowDeleteDialog(false)
+      showToast("Failed to delete emails", "error");
+      setShowDeleteDialog(false);
     },
-  })
+  });
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!sender || !fromDate || !toDate) {
-      showToast('Please fill in all fields', 'error')
-      return
+      showToast("Please fill in all fields", "error");
+      return;
     }
-    searchMutation.mutate()
-  }
+    searchMutation.mutate();
+  };
 
   const handleSelectAllOnPage = () => {
-    const newSet = new Set(selectedIds)
-    const allPageSelected = paginatedEmails.every((email) => selectedIds.has(email.id))
+    const newSet = new Set(selectedIds);
+    const allPageSelected = paginatedEmails.every((email) =>
+      selectedIds.has(email.id)
+    );
 
     if (allPageSelected) {
       // Deselect all on current page
-      paginatedEmails.forEach((email) => newSet.delete(email.id))
+      paginatedEmails.forEach((email) => newSet.delete(email.id));
     } else {
       // Select all on current page
-      paginatedEmails.forEach((email) => newSet.add(email.id))
+      paginatedEmails.forEach((email) => newSet.add(email.id));
     }
-    setSelectedIds(newSet)
-  }
+    setSelectedIds(newSet);
+  };
 
   const handleSelectAllAcrossPages = () => {
     if (selectedIds.size === emails.length) {
       // Deselect all
-      setSelectedIds(new Set())
+      setSelectedIds(new Set());
     } else {
       // Select all emails across all pages
-      setSelectedIds(new Set(emails.map((e) => e.id)))
+      setSelectedIds(new Set(emails.map((e) => e.id)));
     }
-  }
+  };
 
   const toggleSelect = (id: string) => {
-    const newSet = new Set(selectedIds)
+    const newSet = new Set(selectedIds);
     if (newSet.has(id)) {
-      newSet.delete(id)
+      newSet.delete(id);
     } else {
-      newSet.add(id)
+      newSet.add(id);
     }
-    setSelectedIds(newSet)
-  }
+    setSelectedIds(newSet);
+  };
 
   const handleTrash = () => {
-    if (selectedIds.size === 0) return
-    trashMutation.mutate(Array.from(selectedIds))
-  }
+    if (selectedIds.size === 0) return;
+    trashMutation.mutate(Array.from(selectedIds));
+  };
 
   const handleDelete = () => {
-    if (selectedIds.size === 0) return
-    deleteMutation.mutate(Array.from(selectedIds))
-  }
+    if (selectedIds.size === 0) return;
+    deleteMutation.mutate(Array.from(selectedIds));
+  };
 
   if (authLoading) {
     return (
@@ -136,15 +151,18 @@ export default function Dashboard() {
           <p className="text-text text-lg">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!isAuthenticated) {
-    return null
+    return null;
   }
 
-  const paginatedEmails = emails.slice(currentPage * EMAILS_PER_PAGE, (currentPage + 1) * EMAILS_PER_PAGE)
-  const totalPages = Math.ceil(emails.length / EMAILS_PER_PAGE)
+  const paginatedEmails = emails.slice(
+    currentPage * EMAILS_PER_PAGE,
+    (currentPage + 1) * EMAILS_PER_PAGE
+  );
+  const totalPages = Math.ceil(emails.length / EMAILS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-background">
@@ -159,17 +177,27 @@ export default function Dashboard() {
                 <Mail className="text-background" size={18} />
               </div>
               <div>
-                <h1 className="text-base font-display font-semibold text-text">MailSweep</h1>
+                <h1 className="text-base font-display font-semibold text-text">
+                  MailSweep
+                </h1>
                 <p className="text-xs text-muted">{user?.email}</p>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2.5">
-              <Button onClick={() => router.push('/')} variant="secondary" className="text-sm px-4">
+              <Button
+                onClick={() => router.push("/")}
+                variant="secondary"
+                className="text-sm px-4"
+              >
                 <Home size={16} />
                 Home
               </Button>
               <ThemeToggle />
-              <Button onClick={logout} variant="secondary" className="text-sm px-4">
+              <Button
+                onClick={logout}
+                variant="secondary"
+                className="text-sm px-4"
+              >
                 <LogOut size={16} />
                 Disconnect
               </Button>
@@ -181,7 +209,9 @@ export default function Dashboard() {
       <main className="container mx-auto px-6 py-6">
         {/* Search Panel */}
         <div className="card mb-6">
-          <h2 className="text-lg font-display font-semibold text-text mb-1.5">Search with intent</h2>
+          <h2 className="text-lg font-display font-semibold text-text mb-1.5">
+            Search with intent
+          </h2>
           <p className="text-sm text-muted mb-5">
             Filter by sender and date window. Preview before you sweep.
           </p>
@@ -192,14 +222,16 @@ export default function Dashboard() {
               </label>
               <Input
                 type="text"
-                placeholder="e.g. facecard.com or newsletters@company.com"
+                placeholder="e.g. jumia or newsletters@company.com"
                 value={sender}
                 onChange={(e) => setSender(e.target.value)}
               />
             </div>
             <div className="grid md:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-medium text-muted mb-1.5">From date</label>
+                <label className="block text-xs font-medium text-muted mb-1.5">
+                  From date
+                </label>
                 <Input
                   type="date"
                   value={fromDate}
@@ -207,7 +239,9 @@ export default function Dashboard() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-muted mb-1.5">To date</label>
+                <label className="block text-xs font-medium text-muted mb-1.5">
+                  To date
+                </label>
                 <Input
                   type="date"
                   value={toDate}
@@ -215,7 +249,11 @@ export default function Dashboard() {
                 />
               </div>
             </div>
-            <Button type="submit" isLoading={searchMutation.isPending} className="w-full md:w-auto text-sm px-5">
+            <Button
+              type="submit"
+              isLoading={searchMutation.isPending}
+              className="w-full md:w-auto text-sm px-5"
+            >
               <Search size={16} />
               Search Emails
             </Button>
@@ -237,31 +275,42 @@ export default function Dashboard() {
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-3.5">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="text-sm text-text font-medium">
-                    {emails.length} email{emails.length !== 1 ? 's' : ''} found
+                    {emails.length} email{emails.length !== 1 ? "s" : ""} found
                   </span>
                   {paginatedEmails.length > 0 && (
                     <>
                       <label className="flex items-center gap-1.5 cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={paginatedEmails.every((email) => selectedIds.has(email.id)) && paginatedEmails.length > 0}
+                          checked={
+                            paginatedEmails.every((email) =>
+                              selectedIds.has(email.id)
+                            ) && paginatedEmails.length > 0
+                          }
                           onChange={handleSelectAllOnPage}
                           className="w-3.5 h-3.5 accent-primary cursor-pointer"
                         />
-                        <span className="text-xs text-muted">Page ({paginatedEmails.length})</span>
+                        <span className="text-xs text-muted">
+                          Page ({paginatedEmails.length})
+                        </span>
                       </label>
                       <div className="h-4 w-px bg-border" />
                       <button
                         onClick={handleSelectAllAcrossPages}
                         className="text-xs text-muted hover:text-text transition-colors underline decoration-dotted underline-offset-2"
                       >
-                        {selectedIds.size === emails.length ? 'Deselect' : 'Select'} all {emails.length}
+                        {selectedIds.size === emails.length
+                          ? "Deselect"
+                          : "Select"}{" "}
+                        all {emails.length}
                       </button>
                     </>
                   )}
                 </div>
                 {selectedIds.size > 0 && (
-                  <span className="text-sm text-primary font-medium">{selectedIds.size} selected</span>
+                  <span className="text-sm text-primary font-medium">
+                    {selectedIds.size} selected
+                  </span>
                 )}
               </div>
 
@@ -271,7 +320,9 @@ export default function Dashboard() {
                   <div
                     key={email.id}
                     className={`border border-border rounded-xl p-3 transition-colors cursor-pointer ${
-                      selectedIds.has(email.id) ? 'bg-primary/10 border-primary' : 'hover:bg-surface/60'
+                      selectedIds.has(email.id)
+                        ? "bg-primary/10 border-primary"
+                        : "hover:bg-surface/60"
                     }`}
                     onClick={() => toggleSelect(email.id)}
                   >
@@ -284,11 +335,19 @@ export default function Dashboard() {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-0.5">
-                          <span className="text-sm font-medium text-text truncate">{email.sender}</span>
-                          <span className="text-xs text-muted ml-2">{email.date}</span>
+                          <span className="text-sm font-medium text-text truncate">
+                            {email.sender}
+                          </span>
+                          <span className="text-xs text-muted ml-2">
+                            {email.date}
+                          </span>
                         </div>
-                        <p className="text-sm text-text font-medium truncate mb-0.5">{email.subject}</p>
-                        <p className="text-xs text-muted line-clamp-2">{email.snippet}</p>
+                        <p className="text-sm text-text font-medium truncate mb-0.5">
+                          {email.subject}
+                        </p>
+                        <p className="text-xs text-muted line-clamp-2">
+                          {email.snippet}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -308,7 +367,9 @@ export default function Dashboard() {
                       ← Previous
                     </Button>
                     <Button
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages - 1, p + 1))
+                      }
                       disabled={currentPage === totalPages - 1}
                       variant="secondary"
                       className="text-xs px-3 py-2"
@@ -336,8 +397,8 @@ export default function Dashboard() {
                           onClick={() => setCurrentPage(pageNum)}
                           className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
                             currentPage === pageNum
-                              ? 'bg-primary text-background'
-                              : 'bg-surface/60 text-muted hover:bg-surface hover:text-text'
+                              ? "bg-primary text-background"
+                              : "bg-surface/60 text-muted hover:bg-surface hover:text-text"
                           }`}
                         >
                           {pageNum + 1}
@@ -347,7 +408,12 @@ export default function Dashboard() {
                   </div>
 
                   <span className="text-xs text-muted font-mono">
-                    {currentPage * EMAILS_PER_PAGE + 1}-{Math.min((currentPage + 1) * EMAILS_PER_PAGE, emails.length)} of {emails.length}
+                    {currentPage * EMAILS_PER_PAGE + 1}-
+                    {Math.min(
+                      (currentPage + 1) * EMAILS_PER_PAGE,
+                      emails.length
+                    )}{" "}
+                    of {emails.length}
                   </span>
                 </div>
               )}
@@ -358,7 +424,8 @@ export default function Dashboard() {
               <div className="card bg-surface/80 backdrop-blur-sm sticky bottom-4">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <span className="text-sm text-text font-medium">
-                    {selectedIds.size} email{selectedIds.size !== 1 ? 's' : ''} selected
+                    {selectedIds.size} email{selectedIds.size !== 1 ? "s" : ""}{" "}
+                    selected
                   </span>
                   <div className="flex flex-wrap gap-2.5">
                     <Button
@@ -386,21 +453,31 @@ export default function Dashboard() {
         )}
 
         {/* Empty State */}
-        {emails.length === 0 && !searchMutation.isPending && searchMutation.isSuccess && (
-          <div className="card text-center py-10">
-            <Mail className="text-muted mx-auto mb-3" size={48} />
-            <h3 className="text-base font-display font-bold text-text mb-1.5">No emails found</h3>
-            <p className="text-sm text-muted">Try adjusting your search criteria</p>
-          </div>
-        )}
+        {emails.length === 0 &&
+          !searchMutation.isPending &&
+          searchMutation.isSuccess && (
+            <div className="card text-center py-10">
+              <Mail className="text-muted mx-auto mb-3" size={48} />
+              <h3 className="text-base font-display font-bold text-text mb-1.5">
+                No emails found
+              </h3>
+              <p className="text-sm text-muted">
+                Try adjusting your search criteria
+              </p>
+            </div>
+          )}
       </main>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onClose={() => setShowDeleteDialog(false)}>
+      <Dialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+      >
         <DialogHeader>
           <DialogTitle>Permanently Delete Emails?</DialogTitle>
           <DialogDescription>
-            You are about to permanently delete {selectedIds.size} email{selectedIds.size !== 1 ? 's' : ''}. This action cannot be undone.
+            You are about to permanently delete {selectedIds.size} email
+            {selectedIds.size !== 1 ? "s" : ""}. This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <div className="flex gap-2.5 mt-5">
@@ -422,5 +499,5 @@ export default function Dashboard() {
         </div>
       </Dialog>
     </div>
-  )
+  );
 }
